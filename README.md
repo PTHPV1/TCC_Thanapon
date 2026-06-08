@@ -185,13 +185,14 @@ layout กลางของทุกหน้าในระบบ
 ตัวอย่างโครงสร้างเบื้องต้น
 
 ```sql
-CREATE TABLE users (
-    users_code NVARCHAR(50) NOT NULL PRIMARY KEY,
-    users_name NVARCHAR(100) NOT NULL,
-    users_password NVARCHAR(255) NOT NULL,
-    users_date_register DATETIME NULL,
-    users_date_signin DATETIME NULL
-);
+CREATE TABLE [dbo].[users](
+	[users_id] [int] IDENTITY(1,1) NOT NULL,
+	[users_code] [nvarchar](8) NULL,
+	[users_name] [nvarchar](250) NULL,
+	[users_password] [nvarchar](50) NULL,
+	[users_date_register] [datetime] NULL,
+	[users_date_signin] [datetime] NULL
+) ON [PRIMARY]
 ```
 
 ## วิธีรันโปรเจกต์
@@ -213,7 +214,7 @@ dotnet run --project TCC_Thanapon/TCC_Thanapon.csproj
 - `http://localhost:5206`
 - `https://localhost:7204`
 
-## หมายเหตุสำหรับผู้พัฒนา
+## หมายเหตุ
 
 - โปรเจกต์นี้ใช้การเขียน SQL string ตรงในโค้ด ยังไม่ได้ใช้ ORM จริงจังแม้จะอ้างอิงแพ็กเกจ `Microsoft.EntityFrameworkCore.SqlServer`
 - connection string และ JWT secret ยังถูกเขียนไว้ใน source code จึงเหมาะกับงานทดลองหรือใช้ในเครื่องพัฒนาเป็นหลัก
