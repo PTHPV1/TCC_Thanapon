@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "IT 02-3";
+}
+
+<div class="wrapper wrapper-login">
+    <div class="container container-login animated fadeIn">
+        <h3 class="text-center">Welcome</h3>
+        <h6>User: <span id="UserName"></span></h6>
+        <div class="login-form">
+            <div class="form-action mb-3">
+                <button type="button" id="logout" class="btn btn-danger btn-rounded">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var token = localStorage.getItem("JwtToken");
+            if (!token) {
+                window.location.href = "/";
+                return;
+            }
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        var datas = JSON.parse(this.responseText);
+                        if(datas.status === "OK"){
+                             var displayName =  datas.username;
+                             $("#UserName").html(displayName);
+                        } else if(datas.status === "Error"){
+                            window.location.href = "/";
+                        }
+                       
+                    }
+                    else if (this.status == 401) {
+                        localStorage.removeItem("JwtToken");
+                        window.location.href = "/";
+                    }
+                }
+            };
+
+            xmlhttp.onerror = function () {
+                console.error("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+            };
+
+            xmlhttp.ontimeout = function () {
+                console.error("หมดเวลารอการตอบกลับจากเซิร์ฟเวอร์");
+            };
+
+            // ส่งคำขอแบบ POST ไปที่ API
+            xmlhttp.open("POST", "/api/auth/token", true);
+            xmlhttp.setRequestHeader("Authorization", 'Bearer ' + token);
+            xmlhttp.send();
+
+            $("#logout").on("click",function(){
+                localStorage.removeItem("JwtToken");
+                window.location.href = "/";
+                return;
+            });
+        });
+    </script>
+}

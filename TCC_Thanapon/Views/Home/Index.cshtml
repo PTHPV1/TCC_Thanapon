@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "IT 02-1";
+}
+
+<div class="wrapper wrapper-login">
+    <div class="container container-login animated fadeIn">
+        <h3 class="text-center">เข้าสู่ระบบ</h3>
+        <div class="login-form">
+            <div class="form-group form-floating-label">
+                <input id="username" name="username" type="text" class="form-control input-border-bottom" required>
+                <label for="username" class="placeholder">Username</label>
+            </div>
+            <div class="form-group form-floating-label">
+                <input id="password" name="password" type="password" class="form-control input-border-bottom" required>
+                <label for="password" class="placeholder">Password</label>
+                <div class="show-password">
+                    <i class="icon-eye"></i>
+                </div>
+            </div>
+            <div class="form-action mb-3">
+                <button type="button" id="signin" class="btn btn-primary btn-rounded btn-login">ลงชื่อเข้าใช้งาน</button>
+            </div>
+            <div class="login-account">
+                <span class="msg">ยังไม่มีบัญชีใช่ไหม ?</span>
+                <a href="/register" class="link">สมัครสมาชิก</a>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    
+    <script>
+        $(document).ready(function () {
+            $("#signin").on("click",function(){
+                var i_username = $('#username').val();
+                var i_password = $('#password').val();
+                if (!i_username || !i_password) {
+                    alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+                    return false;
+                }
+                
+                var data = JSON.stringify({
+                    username: i_username,
+                    password: i_password
+                });
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        let datas = [];
+                        datas = JSON.parse(this.responseText);
+                        if(datas.status === "OK"){
+                            localStorage.setItem("JwtToken", datas.token);
+                            swal({
+                                title: "ลงชื่อเข้าใช้งานเสร็จสิ้น!",
+                                text: "ระบบกำลังเปลี่ยนเส้นทางไปยังหน้าของผู้ใช้งาน!",
+                                icon: "success",
+                                buttons: false,
+                                closeOnClickOutside: false
+                            });
+                            setTimeout(function () {
+                                window.location.replace("/user");
+                            }, 2 * 1000);
+                        } else if(datas.status === "Error"){
+                            swal("แจ้งเตือน", datas.message, {
+                                icon : "warning",
+                                buttons: {
+                                    confirm: {
+                                        text : 'เข้าใจแล้ว',
+                                        className : 'btn btn-warning'
+                                    }
+                                },
+                            });
+                        }
+                    }
+                };
+                xmlhttp.onerror = function () {
+                };
+                xmlhttp.ontimeout = function () {
+                };
+                xmlhttp.open("POST", "/api/auth/login", true);
+                xmlhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                xmlhttp.setRequestHeader("Accept", "application/json");
+                xmlhttp.send(data);
+            });
+        });
+    </script>
+}
